@@ -1,0 +1,22 @@
+app:
+  name: MyApp
+  version: 1.0.0
+
+http:
+  read_timeout: 5s
+  write_timeout: 5s
+  shutdown_timeout: 3s
+  address: "80"
+
+logger:
+  log_level: info
+  error_enabled: true
+  # output_path: output.log
+  output_path: stderr
+  encoding: console
+
+# database:
+#   url: postgres://user:password@localhost:5432/mydb
+#   pool_max: 10
+#   connection_timeout: 30
+#   connection_attempts: 3
