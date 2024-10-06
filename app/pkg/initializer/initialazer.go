@@ -1,12 +1,12 @@
 package initializer
 
 import (
+	"app/config"
+	"app/pkg/db"
+	"app/pkg/httpserver"
+	"app/pkg/logger"
 	"errors"
 	"fmt"
-	"go-server/config"
-	"go-server/pkg/db"
-	"go-server/pkg/httpserver"
-	"go-server/pkg/logger"
 )
 
 var (

@@ -1,7 +1,7 @@
 package logger
 
 import (
-	"go-server/config"
+	"app/config"
 	"os"
 	"strings"
 

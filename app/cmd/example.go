@@ -1,17 +1,10 @@
 package main
 
 import (
+	"app/config"
+	"app/pkg/initializer"
 	"fmt"
-	"go-server/config"
-	"go-server/pkg/initializer"
 )
-
-// http.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
-// 	server.Logger.Info("Info log", "test log")
-// 	server.Logger.Debug("Debug log", "test log")
-// 	server.Logger.Error("Error log", "test log")
-// 	server.Logger.Warn("Warn log", "test log")
-// })
 
 func DefaultConfigStartup() {
 	init := initializer.WithDefault()
@@ -25,7 +18,7 @@ func DefaultConfigStartup() {
 
 func CustomConfigStartup() {
 
-	cfg, err := config.New("config.yaml")
+	cfg, err := config.New("example_config.yaml")
 	if err != nil {
 		panic(err)
 	}

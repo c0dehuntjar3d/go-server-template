@@ -1,8 +1,8 @@
 package logger
 
 import (
+	"app/config"
 	"fmt"
-	"go-server/config"
 	"strings"
 
 	"go.uber.org/zap"

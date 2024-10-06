@@ -1,6 +1,6 @@
-module go-server
+module app
 
-go 1.23.1
+go 1.23
 
 require (
 	github.com/Masterminds/squirrel v1.5.4

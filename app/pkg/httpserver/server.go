@@ -1,10 +1,10 @@
 package httpserver
 
 import (
+	"app/config"
+	"app/pkg/logger"
 	"context"
 	"fmt"
-	"go-server/config"
-	"go-server/pkg/logger"
 	"net"
 	"net/http"
 	"time"

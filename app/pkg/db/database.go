@@ -1,10 +1,11 @@
 package db
 
 import (
+	"app/config"
+	"app/pkg/logger"
 	"context"
 	"fmt"
-	"go-server/config"
-	"go-server/pkg/logger"
+
 	"sync"
 	"time"
 

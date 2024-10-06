@@ -1,18 +1,19 @@
 package main
 
 import (
+	"app/config"
+	"app/pkg/httpserver"
+	"app/pkg/initializer"
+	"app/pkg/logger"
 	"fmt"
-	"go-server/config"
-	"go-server/pkg/httpserver"
-	"go-server/pkg/initializer"
-	"go-server/pkg/logger"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 )
 
 func main() {
-	cfg, err := config.New("test_config.yaml")
+	cfg, err := config.New("config.yaml")
 	if err != nil {
 		panic(err)
 	}
@@ -23,6 +24,11 @@ func main() {
 	}
 
 	server := init.Server
+
+	http.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
+		server.Logger.Info("Info log")
+	})
+
 	go server.Start()
 
 	waitForSignals(init.Logger, server)
