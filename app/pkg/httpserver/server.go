@@ -11,19 +11,53 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Server struct {
+	Mux             *http.ServeMux
 	Server          *http.Server
 	Logger          logger.Interface
 	notify          chan error
 	shutdownTimeout time.Duration
 }
 
+func loggingMiddleware(next http.Handler, logger logger.Interface) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		UUID := uuid.New().String()
+
+		logger.Info(
+			fmt.Sprintf(
+				"Request: [%s] -> Path: [%s] | UUID: %s",
+				r.Method,
+				r.RequestURI,
+				UUID,
+			),
+		)
+
+		next.ServeHTTP(w, r)
+
+		logger.Debug(
+			fmt.Sprintf(
+				"Request Completed: [%s] -> Path: [%s] in [%v] | UUID: %s",
+				r.Method,
+				r.RequestURI,
+				time.Since(start),
+				UUID,
+			),
+		)
+	})
+}
+
 func New(cfg *config.HTTP, logger logger.Interface) *Server {
+	mux := http.NewServeMux()
 	server := &Server{
 		Logger: logger,
+		Mux:    mux,
 		Server: &http.Server{
+			Handler:      loggingMiddleware(mux, logger),
 			ReadTimeout:  cfg.ReadTimeout,
 			WriteTimeout: cfg.WriteTimeout,
 			Addr:         net.JoinHostPort("", cfg.Address),

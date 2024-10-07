@@ -10,8 +10,8 @@ func main() {
 
 	server := initialize.Server
 
-	http.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
-		server.Logger.Info("Info log")
+	server.Mux.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
+		server.Logger.Warn("Info log")
 	})
 
 	server.Start()

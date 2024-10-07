@@ -67,28 +67,28 @@ func NewZap(cfg *config.Log) (*ZapLogger, error) {
 
 func (l *ZapLogger) Debug(message string, args ...Field) {
 	if len(args) == 0 {
-		l.logger.Debug(message)
+		l.logger.Debug(withColor(Cyan, message))
 	} else {
 		fields := mapFields(args...)
-		l.logger.Debug(message, fields...)
+		l.logger.Debug(withColor(Cyan, message), fields...)
 	}
 }
 
 func (l *ZapLogger) Info(message string, args ...Field) {
 	if len(args) == 0 {
-		l.logger.Info(message)
+		l.logger.Info(withColor(Green, message))
 	} else {
 		fields := mapFields(args...)
-		l.logger.Info(message, fields...)
+		l.logger.Info(withColor(Green, message), fields...)
 	}
 }
 
 func (l *ZapLogger) Warn(message string, args ...Field) {
 	if len(args) == 0 {
-		l.logger.Warn(message)
+		l.logger.Warn(withColor(Yellow, message))
 	} else {
 		fields := mapFields(args...)
-		l.logger.Warn(message, fields...)
+		l.logger.Warn(withColor(Yellow, message), fields...)
 	}
 }
 
@@ -99,19 +99,19 @@ func (l *ZapLogger) Error(message string, args ...Field) {
 	}
 
 	if len(args) == 0 {
-		l.logger.Error(message)
+		l.logger.Error(withColor(Red, message))
 	} else {
 		fields := mapFields(args...)
-		l.logger.Error(message, fields...)
+		l.logger.Error(withColor(Red, message), fields...)
 	}
 }
 
 func (l *ZapLogger) Fatal(message string, args ...Field) {
 	if len(args) == 0 {
-		l.logger.Fatal(message)
+		l.logger.Fatal(withColor(Red, message))
 	} else {
 		fields := mapFields(args...)
-		l.logger.Fatal(message, fields...)
+		l.logger.Fatal(withColor(Red, message), fields...)
 	}
 }
 
