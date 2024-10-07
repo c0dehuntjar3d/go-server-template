@@ -2,19 +2,25 @@ package config
 
 import (
 	"errors"
+	"flag"
 	"os"
+	"sync"
 	"time"
 
 	"gopkg.in/yaml.v3"
 )
 
 var (
-	ErrNoFilename  = errors.New("file invalid")
-	ErrBadFilename = errors.New("bad file")
-	ErrDBNoURL     = errors.New("database configuration: URL is required if other parameters are set")
+	ErrNoFilename         = errors.New("filename invalid")
+	ErrCannotReadFilename = errors.New("cannot read from file")
+	ErrDBNoURL            = errors.New("database configuration: URL is required if other parameters are set")
 )
 
 const (
+	_defaultConfigPath            = "../config/application.yaml"
+	_defaultConfigFlag            = "config"
+	_defaultConfigFlagDescription = "Path to configuration"
+
 	// HTTP
 	_defaultReadTimeout     = 5 * time.Second
 	_defaultWriteTimeout    = 5 * time.Second
@@ -22,7 +28,7 @@ const (
 	_defaultAddress         = "80"
 
 	// APPLICATION
-	_defaultAppName = "Default Applicaiton"
+	_defaultAppName = "Hellow world, Applicaiton!"
 	_defaultVersion = "0.0.1"
 
 	// LOGGER
@@ -72,6 +78,29 @@ type (
 	}
 )
 
+var hdlOnce sync.Once
+var config *Config
+
+func LoadOrGetSingleton() (*Config, error) {
+
+	hdlOnce.Do(func() {
+		configPath := getConfigPath()
+
+		var err error
+		config, err = New(*configPath)
+		if err != nil {
+
+			if errors.Is(err, ErrNoFilename) || errors.Is(err, ErrCannotReadFilename) {
+				config = WithDefault()
+			} else {
+				panic(err)
+			}
+		}
+	})
+
+	return config, nil
+}
+
 func WithDefault() *Config {
 	return &Config{
 		App: &App{
@@ -101,24 +130,35 @@ func New(configPath string) (*Config, error) {
 
 	file, err := os.ReadFile(configPath)
 	if err != nil {
-		return WithDefault(), ErrBadFilename
+		return WithDefault(), ErrCannotReadFilename
 	}
 
-	var config *Config
-	err = yaml.Unmarshal(file, &config)
+	var cfg *Config
+	err = yaml.Unmarshal(file, &cfg)
 	if err != nil {
-		return WithDefault(), err
+		return nil, err
 	}
 
-	err = config.mergeWithDefault()
+	err = cfg.mergeWithDefaultSettings()
 	if err != nil {
-		return config, err
+		return cfg, err
 	}
 
-	return config, nil
+	return cfg, nil
 }
 
-func (c *Config) mergeWithDefault() error {
+func getConfigPath() *string {
+	configPath := flag.String(
+		_defaultConfigFlag,
+		_defaultConfigPath,
+		_defaultConfigFlagDescription,
+	)
+	flag.Parse()
+
+	return configPath
+}
+
+func (c *Config) mergeWithDefaultSettings() error {
 	if c.App != nil {
 		c.App.mergeWithDefault()
 	} else {

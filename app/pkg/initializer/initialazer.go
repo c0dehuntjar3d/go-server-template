@@ -19,6 +19,22 @@ type Initializer struct {
 	Server *httpserver.Server
 }
 
+func InitApplicaiton() (*Initializer, *config.Config) {
+	var err error
+	cfg, err := config.LoadOrGetSingleton()
+	if err != nil {
+		panic(fmt.Errorf("failed to load config: %w", err))
+	}
+
+	initialize, err := New(cfg)
+	if err != nil {
+		panic(fmt.Errorf("failed to initialize: %w", err))
+	}
+	initialize.Logger.Info("Configuration was loaded success")
+
+	return initialize, cfg
+}
+
 func WithDefault() *Initializer {
 	cfg := config.WithDefault()
 
@@ -27,11 +43,10 @@ func WithDefault() *Initializer {
 		fmt.Println(err)
 	}
 
-	db := db.NewOrGetSingleton(cfg.DB, log)
 	server := httpserver.New(cfg.Http, log)
 
 	return &Initializer{
-		DB:     db,
+		DB:     nil,
 		Logger: log,
 		Server: server,
 	}
@@ -46,7 +61,12 @@ func New(cfg *config.Config) (*Initializer, error) {
 	if err != nil {
 		return nil, err
 	}
-	db := db.NewOrGetSingleton(cfg.DB, log)
+
+	db, err := db.NewOrGetSingleton(cfg.DB, log)
+	if err != nil {
+		return nil, err
+	}
+
 	server := httpserver.New(cfg.Http, log)
 
 	return &Initializer{

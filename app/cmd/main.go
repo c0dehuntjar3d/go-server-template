@@ -1,7 +1,6 @@
 package main
 
 import (
-	"app/config"
 	"app/pkg/httpserver"
 	"app/pkg/initializer"
 	"app/pkg/logger"
@@ -13,17 +12,9 @@ import (
 )
 
 func main() {
-	cfg, err := config.New("config.yaml")
-	if err != nil {
-		panic(err)
-	}
+	initialize, _ := initializer.InitApplicaiton()
 
-	init, err := initializer.New(cfg)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	server := init.Server
+	server := initialize.Server
 
 	http.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
 		server.Logger.Info("Info log")
@@ -31,11 +22,11 @@ func main() {
 
 	go server.Start()
 
-	waitForSignals(init.Logger, server)
-	shutdown(server, init.Logger)
+	waitForSignals(server, initialize.Logger)
+	shutdown(server, initialize.Logger)
 }
 
-func waitForSignals(log logger.Interface, httpServer *httpserver.Server) error {
+func waitForSignals(httpServer *httpserver.Server, log logger.Interface) error {
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 
@@ -43,6 +34,7 @@ func waitForSignals(log logger.Interface, httpServer *httpserver.Server) error {
 	select {
 	case s := <-interrupt:
 		log.Info("app - Run - signal: " + s.String())
+		shutdown(httpServer, log)
 	case err = <-httpServer.Notify():
 		log.Error(fmt.Errorf("app - Run - httpServer.Notify: %w", err).Error())
 	}

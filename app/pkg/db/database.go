@@ -32,21 +32,22 @@ type Database struct {
 var pg *Database
 var hdlOnce sync.Once
 
-func NewOrGetSingleton(cfg *config.DB, logger logger.Interface) *Database {
+func NewOrGetSingleton(cfg *config.DB, logger logger.Interface) (*Database, error) {
 	if cfg == nil || cfg.URL == "" {
-		return nil
+		return nil, nil
 	}
 
+	var er error
 	hdlOnce.Do(func() {
 		db, err := newDatabase(cfg, logger)
 		if err != nil {
-			panic(err)
+			er = err
 		}
 
 		pg = db
 	})
 
-	return pg
+	return pg, er
 }
 
 func newDatabase(cfg *config.DB, log logger.Interface) (*Database, error) {

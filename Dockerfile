@@ -14,6 +14,6 @@ RUN go build -o ./bin/app cmd/main.go
 FROM alpine 
 
 COPY --from=builder /usr/local/src/bin/app /
-COPY config/config.yaml /config.yaml
+COPY config/application.yaml config/application.yaml
 
 CMD ["/app"]
