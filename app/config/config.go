@@ -81,7 +81,7 @@ func LoadOrGetSingleton() (*Config, error) {
 			fmt.Println("Warning: .env file not found")
 		}
 
-		config = NewFromEnv()
+		config = New()
 	})
 
 	return config, nil
@@ -109,7 +109,7 @@ func Default() *Config {
 	}
 }
 
-func NewFromEnv() *Config {
+func New() *Config {
 	return &Config{
 		App: &App{
 			Name:    getEnv("APP_NAME", defaultAppName),
