@@ -16,6 +16,8 @@ import (
 )
 
 type Server struct {
+	Name            string
+	Version         string
 	Mux             *http.ServeMux
 	Server          *http.Server
 	Logger          logger.Interface
@@ -51,11 +53,13 @@ func loggingMiddleware(next http.Handler, logger logger.Interface) http.Handler 
 	})
 }
 
-func New(cfg *config.HTTP, logger logger.Interface) *Server {
+func New(cfg *config.HTTP, cfgApp *config.App, logger logger.Interface) *Server {
 	mux := http.NewServeMux()
 	server := &Server{
-		Logger: logger,
-		Mux:    mux,
+		Name:    cfgApp.Name,
+		Version: cfgApp.Version,
+		Logger:  logger,
+		Mux:     mux,
 		Server: &http.Server{
 			Handler:      loggingMiddleware(mux, logger),
 			ReadTimeout:  cfg.ReadTimeout,
@@ -72,7 +76,7 @@ func New(cfg *config.HTTP, logger logger.Interface) *Server {
 func (s *Server) Start() {
 
 	go func() {
-		s.Logger.Info(fmt.Sprint("Server was started on port: ", s.Server.Addr))
+		s.Logger.Info(fmt.Sprintf("%s [%s] was started on port %s", s.Name, s.Version, s.Server.Addr))
 
 		s.notify <- s.Server.ListenAndServe()
 		close(s.notify)

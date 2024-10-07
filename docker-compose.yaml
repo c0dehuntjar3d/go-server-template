@@ -1,0 +1,24 @@
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - APP_NAME=Go-Server-Docker
+      - APP_VERSION=0.0.1:docker
+      - HTTP_ADDRESS=8080
+      - HTTP_READ_TIMEOUT=5s
+      - HTTP_WRITE_TIMEOUT=5s
+      - HTTP_SHUTDOWN_TIMEOUT=3s
+      - LOG_LEVEL=info
+      - LOG_ENCODING=console
+      - LOG_OUTPUT_PATH=stderr
+      - LOG_ERROR_ENABLED=true
+    ports:
+      - "8080:8080" 
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

@@ -35,15 +35,15 @@ func InitApplicaiton() (*Initializer, *config.Config) {
 	return initialize, cfg
 }
 
-func WithDefault() *Initializer {
-	cfg := config.WithDefault()
+func DefaultApplication() *Initializer {
+	cfg := config.Default()
 
 	log, err := logger.NewZap(cfg.Log)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	server := httpserver.New(cfg.Http, log)
+	server := httpserver.New(cfg.Http, cfg.App, log)
 
 	return &Initializer{
 		DB:     nil,
@@ -67,7 +67,7 @@ func New(cfg *config.Config) (*Initializer, error) {
 		return nil, err
 	}
 
-	server := httpserver.New(cfg.Http, log)
+	server := httpserver.New(cfg.Http, cfg.App, log)
 
 	return &Initializer{
 		DB:     db,
