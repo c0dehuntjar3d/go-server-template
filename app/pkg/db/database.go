@@ -13,11 +13,6 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
-const (
-	DefaultConnAttempts = 10
-	DefaultConnTimeout  = time.Second
-)
-
 type Database struct {
 	maxPoolSize  int
 	connAttempts int

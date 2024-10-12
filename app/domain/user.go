@@ -5,15 +5,9 @@ import (
 )
 
 type User struct {
+	Uuid      string
 	Login     string
 	Password  string
-	Info      UserInfo
-	CreatedAt time.Time
+	CreatedAt *time.Time
 	UpdatedAt *time.Time
-}
-
-type UserInfo struct {
-	FirstName string
-	LastName  string
-	Age       int64
 }
