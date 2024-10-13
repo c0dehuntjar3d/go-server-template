@@ -2,7 +2,7 @@ package initializer
 
 import (
 	"app/config"
-	"app/pkg/db"
+	"app/pkg/database"
 	"app/pkg/httpserver"
 	"app/pkg/logger"
 	"errors"
@@ -14,7 +14,7 @@ var (
 )
 
 type Initializer struct {
-	DB     *db.Database
+	DB     *database.Postgres
 	Logger logger.Interface
 	Server *httpserver.Server
 }
@@ -62,7 +62,7 @@ func New(cfg *config.Config) (*Initializer, error) {
 		return nil, err
 	}
 
-	db, err := db.NewOrGetSingleton(cfg.DB, log)
+	db, err := database.NewOrGetSingletonPostgres(cfg.DB, log)
 	if err != nil {
 		return nil, err
 	}

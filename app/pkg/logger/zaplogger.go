@@ -93,11 +93,6 @@ func (l *ZapLogger) Warn(message string, args ...Field) {
 }
 
 func (l *ZapLogger) Error(message string, args ...Field) {
-	if l.logger.Level() == zapcore.DebugLevel {
-		l.Debug(message, args...)
-		return
-	}
-
 	if len(args) == 0 {
 		l.logger.Error(withColor(Red, message))
 	} else {

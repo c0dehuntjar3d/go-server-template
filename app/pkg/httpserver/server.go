@@ -3,6 +3,7 @@ package httpserver
 import (
 	"app/config"
 	"app/pkg/logger"
+	"app/pkg/middleware"
 	"context"
 	"fmt"
 	"net"
@@ -11,8 +12,6 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 type Server struct {
@@ -25,34 +24,6 @@ type Server struct {
 	shutdownTimeout time.Duration
 }
 
-func loggingMiddleware(next http.Handler, logger logger.Interface) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		start := time.Now()
-		UUID := uuid.New().String()
-
-		logger.Info(
-			fmt.Sprintf(
-				"Request: [%s] -> Path: [%s] | UUID: %s",
-				r.Method,
-				r.RequestURI,
-				UUID,
-			),
-		)
-
-		next.ServeHTTP(w, r)
-
-		logger.Debug(
-			fmt.Sprintf(
-				"Request Completed: [%s] -> Path: [%s] in [%v] | UUID: %s",
-				r.Method,
-				r.RequestURI,
-				time.Since(start),
-				UUID,
-			),
-		)
-	})
-}
-
 func New(cfg *config.HTTP, cfgApp *config.App, logger logger.Interface) *Server {
 	mux := http.NewServeMux()
 	server := &Server{
@@ -61,7 +32,7 @@ func New(cfg *config.HTTP, cfgApp *config.App, logger logger.Interface) *Server 
 		Logger:  logger,
 		Mux:     mux,
 		Server: &http.Server{
-			Handler:      loggingMiddleware(mux, logger),
+			Handler:      middleware.Logging(mux, logger),
 			ReadTimeout:  cfg.ReadTimeout,
 			WriteTimeout: cfg.WriteTimeout,
 			Addr:         net.JoinHostPort("", cfg.Address),

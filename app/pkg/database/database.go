@@ -1,4 +1,4 @@
-package db
+package database
 
 import (
 	"app/config"
@@ -13,8 +13,7 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
-type Database struct {
-	maxPoolSize  int
+type Postgres struct {
 	connAttempts int
 	connTimeout  time.Duration
 
@@ -24,10 +23,10 @@ type Database struct {
 	logger logger.Interface
 }
 
-var pg *Database
+var pg *Postgres
 var hdlOnce sync.Once
 
-func NewOrGetSingleton(cfg *config.DB, logger logger.Interface) (*Database, error) {
+func NewOrGetSingletonPostgres(cfg *config.DB, logger logger.Interface) (*Postgres, error) {
 	if cfg == nil || cfg.URL == "" {
 		return nil, nil
 	}
@@ -45,10 +44,9 @@ func NewOrGetSingleton(cfg *config.DB, logger logger.Interface) (*Database, erro
 	return pg, er
 }
 
-func newDatabase(cfg *config.DB, log logger.Interface) (*Database, error) {
-	pg = &Database{
+func newDatabase(cfg *config.DB, log logger.Interface) (*Postgres, error) {
+	pg = &Postgres{
 		logger:       log,
-		maxPoolSize:  cfg.PoolMax,
 		connAttempts: cfg.ConnectionAttempts,
 		connTimeout:  time.Duration(cfg.ConnectionTimeout),
 	}
@@ -60,15 +58,13 @@ func newDatabase(cfg *config.DB, log logger.Interface) (*Database, error) {
 		return nil, fmt.Errorf("postgres - NewPostgres - pgxpool.ParseConfig: %w", err)
 	}
 
-	poolConfig.MaxConns = int32(pg.maxPoolSize)
-
 	for pg.connAttempts > 0 {
 		pg.Pool, err = pgxpool.ConnectConfig(context.Background(), poolConfig)
 		if err == nil {
 			break
 		}
 
-		log.Info(fmt.Sprint("Postgres is trying to connect, attempts left: ", pg.connAttempts))
+		log.Warn(fmt.Sprint("Postgres is trying to connect, attempts left: ", pg.connAttempts))
 
 		time.Sleep(pg.connTimeout)
 
@@ -82,7 +78,7 @@ func newDatabase(cfg *config.DB, log logger.Interface) (*Database, error) {
 	return pg, nil
 }
 
-func (p *Database) Close() {
+func (p *Postgres) Close() {
 	if p.Pool != nil {
 		p.Pool.Close()
 	}
