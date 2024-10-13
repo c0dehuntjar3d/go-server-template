@@ -29,7 +29,6 @@ const (
 	defaultLogErrorEnabled = true
 
 	defaultDBURL                = ""
-	defaultDBPoolMax            = 10
 	defaultDBConnectionTimeout  = 30
 	defaultDBConnectionAttempts = 3
 )
@@ -63,7 +62,6 @@ type (
 
 	DB struct {
 		URL                string
-		PoolMax            int
 		ConnectionTimeout  int
 		ConnectionAttempts int
 	}
@@ -129,7 +127,6 @@ func New() *Config {
 		},
 		DB: &DB{
 			URL:                getEnv("DB_URL", defaultDBURL),
-			PoolMax:            getEnvAsInt("DB_POOL_MAX", defaultDBPoolMax),
 			ConnectionTimeout:  getEnvAsInt("DB_CONNECTION_TIMEOUT", defaultDBConnectionTimeout),
 			ConnectionAttempts: getEnvAsInt("DB_CONNECTION_ATTEMPTS", defaultDBConnectionAttempts),
 		},
