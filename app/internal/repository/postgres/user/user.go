@@ -46,7 +46,7 @@ func (r *repository) Create(ctx context.Context, u *domain.User) (*domain.User, 
 	}
 
 	txID := ctx.Value(types.CtxKey("tx")).(string)
-	r.logger.Debug(fmt.Sprintf("txID: %s, Creating user: %v", txID, u))
+	r.logger.Debug(fmt.Sprintf("txID: %s [repository], creating user: %v", txID, u))
 
 	query := `INSERT INTO users (uuid, login, password, created_at) 
               VALUES ($1, $2, $3, $4) RETURNING uuid`
@@ -64,11 +64,11 @@ func (r *repository) Create(ctx context.Context, u *domain.User) (*domain.User, 
 	).Scan(&repoUser.Uuid)
 
 	if err != nil {
-		r.logger.Error(fmt.Sprintf("txID: %s, Error creating user: %v", txID, err))
+		r.logger.Error(fmt.Sprintf("txID: %s [repository], error creating user: %v", txID, err))
 		return nil, err
 	}
 
-	r.logger.Debug(fmt.Sprintf("txID: %s, Successfully created user with UUID: %s", txID, repoUser.Uuid))
+	r.logger.Debug(fmt.Sprintf("txID: %s [repository], successfully created user with UUID: %s", txID, repoUser.Uuid))
 
 	return converter.ToUserFromRepository(repoUser), nil
 }
@@ -76,7 +76,7 @@ func (r *repository) Create(ctx context.Context, u *domain.User) (*domain.User, 
 func (r *repository) Delete(ctx context.Context, uuid string) (*domain.User, error) {
 	txID := ctx.Value(types.CtxKey("tx")).(string)
 
-	r.logger.Debug(fmt.Sprintf("txID: %s, Soft deleting user with UUID: %s", txID, uuid))
+	r.logger.Debug(fmt.Sprintf("txID: %s [repository], deleting user with UUID: %s", txID, uuid))
 
 	query := `UPDATE users 
               SET deleted_at = $1 
@@ -96,11 +96,11 @@ func (r *repository) Delete(ctx context.Context, uuid string) (*domain.User, err
 	)
 
 	if err != nil {
-		r.logger.Error(fmt.Sprintf("txID: %s, Error soft deleting user: %v", txID, err))
+		r.logger.Error(fmt.Sprintf("txID: %s [repository], error soft deleting user: %v", txID, err))
 		return nil, err
 	}
 
-	r.logger.Debug(fmt.Sprintf("txID: %s, Successfully soft deleted user with UUID: %s", txID, user.Uuid))
+	r.logger.Debug(fmt.Sprintf("txID: %s [repository], successfully soft deleted user with UUID: %s", txID, user.Uuid))
 
 	return converter.ToUserFromRepository(user), nil
 }
@@ -108,7 +108,7 @@ func (r *repository) Delete(ctx context.Context, uuid string) (*domain.User, err
 func (r *repository) Get(ctx context.Context, uuid string) (*domain.User, error) {
 	txID := ctx.Value(types.CtxKey("tx")).(string)
 
-	r.logger.Debug(fmt.Sprintf("txID: %s, Fetching user with UUID: %s", txID, uuid))
+	r.logger.Debug(fmt.Sprintf("txID: %s [repository], fetching user with UUID: %s", txID, uuid))
 
 	query := `SELECT uuid, login, password, created_at, updated_at, deleted_at 
               FROM users WHERE uuid = $1`
@@ -129,11 +129,11 @@ func (r *repository) Get(ctx context.Context, uuid string) (*domain.User, error)
 	)
 
 	if err != nil {
-		r.logger.Error(fmt.Sprintf("txID: %s, Error fetching user: %v", txID, err))
+		r.logger.Error(fmt.Sprintf("txID: %s [repository], error fetching user: %v", txID, err))
 		return nil, err
 	}
 
-	r.logger.Debug(fmt.Sprintf("txID: %s, Successfully fetched user with UUID: %s", txID, user.Uuid))
+	r.logger.Debug(fmt.Sprintf("txID: %s [repository], successfully fetched user with UUID: %s", txID, user.Uuid))
 
 	return converter.ToUserFromRepository(user), nil
 }

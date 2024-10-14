@@ -1,19 +1,20 @@
 package middleware
 
 import (
-	"app/pkg/common"
 	"app/pkg/logger"
 	"app/pkg/types"
 	"context"
 	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 func Logging(next http.Handler, logger logger.Interface) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
-		UUID := common.GenerateUUID()
+		UUID := uuid.New().String()
 
 		r = r.WithContext(
 			context.WithValue(r.Context(), types.CtxKey("tx"), UUID),

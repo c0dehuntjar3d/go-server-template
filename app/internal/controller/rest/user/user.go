@@ -83,9 +83,5 @@ func (h *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
-}
-
-func (h *UserHandler) RegisterRoutes(mux *http.ServeMux) {
-
+	w.WriteHeader(http.StatusOK)
 }
