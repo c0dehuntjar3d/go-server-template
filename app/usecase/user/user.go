@@ -4,7 +4,6 @@ import (
 	"app/config"
 	userHandler "app/internal/controller/rest/user"
 	userRepo "app/internal/repository/postgres/user"
-	"app/internal/service/user"
 	userService "app/internal/service/user"
 	"app/pkg/database"
 	"app/pkg/httpserver"
@@ -41,7 +40,7 @@ func (u *UserUseCase) Initialize(
 		return nil, err
 	}
 
-	service, err := user.NewUserService(repo, log)
+	service, err := userService.NewUserService(repo, log)
 	if err != nil {
 		return nil, err
 	}
