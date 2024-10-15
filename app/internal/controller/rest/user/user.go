@@ -1,32 +1,40 @@
-package rest
+package user
 
 import (
 	"app/domain"
 	"app/internal/controller/rest/user/converter"
 	rest "app/internal/controller/rest/user/model"
+	"app/internal/service/user"
 	"app/pkg/logger"
-	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 )
 
-type UserService interface {
-	Create(ctx context.Context, user *domain.User) (string, error)
-	Delete(ctx context.Context, uuid string) error
-	Get(ctx context.Context, uuid string) (*domain.User, error)
-}
-
 type UserHandler struct {
-	Service UserService
+	Service user.UserService
 	logger  logger.Interface
 }
 
-func NewUserHandler(service UserService, logger logger.Interface, mux *http.ServeMux) *UserHandler {
+func NewUserHandler(service user.UserService, logger logger.Interface, mux *http.ServeMux) (*UserHandler, error) {
+
+	if service == nil {
+		return nil, errors.New("service is null")
+	}
+
+	if logger == nil {
+		return nil, errors.New("logger is null")
+	}
+
+	if mux == nil {
+		return nil, errors.New("mux is null")
+	}
+
 	handler := &UserHandler{Service: service, logger: logger}
 	mux.HandleFunc("POST /users", handler.CreateUser)
 	mux.HandleFunc("GET /users", handler.GetUser)
 	mux.HandleFunc("DELETE /users", handler.DeleteUser)
-	return handler
+	return handler, nil
 }
 
 func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {

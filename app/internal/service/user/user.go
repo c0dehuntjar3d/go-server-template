@@ -2,7 +2,7 @@ package user
 
 import (
 	"app/domain"
-	def "app/internal/controller/rest/user"
+	"app/internal/repository/postgres/user"
 	"app/pkg/logger"
 	"app/pkg/types"
 	"context"
@@ -10,20 +10,14 @@ import (
 	"fmt"
 )
 
-type UserRepository interface {
-	Create(ctx context.Context, user *domain.User) (*domain.User, error)
-	Get(ctx context.Context, uuid string) (*domain.User, error)
-	Delete(ctx context.Context, uuid string) (*domain.User, error)
-}
-
-var _ def.UserService = (*service)(nil)
+var _ UserService = (*service)(nil)
 
 type service struct {
-	repository UserRepository
+	repository user.UserRepository
 	logger     logger.Interface
 }
 
-func NewUserService(repository UserRepository, logger logger.Interface) (*service, error) {
+func NewUserService(repository user.UserRepository, logger logger.Interface) (*service, error) {
 	if repository == nil {
 		return nil, errors.New("db is null")
 	}

@@ -5,6 +5,8 @@ import (
 	"app/pkg/database"
 	"app/pkg/httpserver"
 	"app/pkg/logger"
+	"app/usecase"
+	"app/usecase/user"
 	"errors"
 	"fmt"
 )
@@ -32,6 +34,7 @@ func InitApplicaiton() (*Initializer, *config.Config) {
 	}
 	initialize.Logger.Info("Configuration was loaded success")
 
+	loadUseCases(initialize, *cfg)
 	return initialize, cfg
 }
 
@@ -74,4 +77,20 @@ func New(cfg *config.Config) (*Initializer, error) {
 		Logger: log,
 		Server: server,
 	}, nil
+}
+
+func loadUseCases(initializr *Initializer, cfg config.Config) {
+	usecases := []usecase.UseCase{
+		user.NewUserUseCase(),
+	}
+
+	for _, uc := range usecases {
+		_, err := uc.Initialize(initializr.Logger, cfg, initializr.Server, initializr.DB)
+		if err != nil {
+			initializr.Logger.Fatal(fmt.Sprintf("Usecase %s load error: %s", uc.Name(), err.Error()))
+		} else {
+			initializr.Logger.Debug(fmt.Sprintf("Usecase %s load success", uc.Name()))
+		}
+
+	}
 }

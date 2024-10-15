@@ -1,4 +1,4 @@
-package repository
+package user
 
 import (
 	"app/domain"
@@ -7,7 +7,6 @@ import (
 	"app/pkg/database"
 	"app/pkg/logger"
 	"app/pkg/types"
-	def "app/service/user"
 	"context"
 	"errors"
 	"fmt"
@@ -18,7 +17,7 @@ func NewRepository() *repository {
 	return &repository{}
 }
 
-var _ def.UserRepository = (*repository)(nil)
+var _ UserRepository = (*repository)(nil)
 
 type repository struct {
 	db     *database.Postgres
