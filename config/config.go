@@ -178,7 +178,7 @@ func getEnvAsDuration(name string, defaultValue time.Duration) time.Duration {
 func getEnvPath() *string {
 	configPath := flag.String(
 		"env",
-		"../.env",
+		"./.env",
 		"Path to configuration",
 	)
 	flag.Parse()
