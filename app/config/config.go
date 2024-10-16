@@ -31,14 +31,17 @@ const (
 	defaultDBURL                = ""
 	defaultDBConnectionTimeout  = 30
 	defaultDBConnectionAttempts = 3
+
+	redisURL = ""
 )
 
 type (
 	Config struct {
-		App  *App
-		Http *HTTP
-		Log  *Log
-		DB   *DB
+		App   *App
+		Http  *HTTP
+		Log   *Log
+		DB    *DB
+		Cache *Cache
 	}
 
 	App struct {
@@ -64,6 +67,10 @@ type (
 		URL                string
 		ConnectionTimeout  int
 		ConnectionAttempts int
+	}
+
+	Cache struct {
+		URL string
 	}
 )
 
@@ -103,7 +110,8 @@ func Default() *Config {
 			OutputPath:   defaultLogOutputPath,
 			ErrorEnabled: defaultLogErrorEnabled,
 		},
-		DB: &DB{},
+		DB:    &DB{},
+		Cache: &Cache{},
 	}
 }
 
@@ -129,6 +137,9 @@ func New() *Config {
 			URL:                getEnv("DB_URL", defaultDBURL),
 			ConnectionTimeout:  getEnvAsInt("DB_CONNECTION_TIMEOUT", defaultDBConnectionTimeout),
 			ConnectionAttempts: getEnvAsInt("DB_CONNECTION_ATTEMPTS", defaultDBConnectionAttempts),
+		},
+		Cache: &Cache{
+			URL: getEnv("REDIS_URL", redisURL),
 		},
 	}
 }
