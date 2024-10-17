@@ -4,7 +4,7 @@ import (
 	"app/domain"
 	"app/internal/controller/rest/user/converter"
 	rest "app/internal/controller/rest/user/model"
-	"app/internal/service/user"
+	"app/internal/usecase/user"
 	"app/pkg/logger"
 	"encoding/json"
 	"errors"

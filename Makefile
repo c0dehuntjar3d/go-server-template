@@ -3,20 +3,24 @@ ENV_FILE := .env
 include $(ENV_FILE)
 export $(shell sed 's/=.*//' $(ENV_FILE))  
 
+full-run: deps test build run
+
 test: 
 	@echo "Running tests..."
 	@go test ./...
 
 run:
 	@echo "Running $(APP_NAME)..."
-	@source $(ENV_FILE) && go run cmd/main.go
+	@source $(ENV_FILE) && bin/${APP_NAME}
+
+build:
+	@echo "Building ${APP_NAME}"
+	@mkdir -p bin
+	@go build -o bin/${APP_NAME} cmd/main.go
 
 deps:
 	@echo "Installing dependencies..."
 	@go mod tidy
-
-full-run: test run
-	@echo "Tests passed, migrations applied, running the application..."
 
 docker-build:
 	@echo "Building Docker image $(DOCKER_IMAGE)..."

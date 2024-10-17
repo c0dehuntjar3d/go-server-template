@@ -1,4 +1,4 @@
-package usecase
+package adapter
 
 import (
 	"app/config"
@@ -7,13 +7,13 @@ import (
 	"app/pkg/logger"
 )
 
-type UseCase interface {
+type Adapter interface {
 	Initialize(
 		log logger.Interface,
 		cfg config.Config,
 		server *httpserver.Server,
 		db *database.Postgres,
-	) (UseCase, error)
+	) error
 
 	Name() string
 }
