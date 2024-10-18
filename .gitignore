@@ -14,3 +14,4 @@ go.work.sum
 .env
 *.log
 go.sum
+bin
