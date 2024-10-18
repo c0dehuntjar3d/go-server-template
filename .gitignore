@@ -11,6 +11,7 @@
 go.work
 go.work.sum
 
+docker.env
 .env
 *.log
 go.sum

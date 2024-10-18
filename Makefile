@@ -1,9 +1,16 @@
-ENV_FILE := .env 
+ENV_FILE := .env
 
 include $(ENV_FILE)
 export $(shell sed 's/=.*//' $(ENV_FILE))  
 
-local-run: deps test build database migration run
+startup: deps test build database migration run
+
+env:
+	@echo "Creating local env..."
+	@cp env.example.env .env
+	@cp env.example.env docker.env
+	@echo ".env and docker.env files was created successfully!"
+	@echo "Don't forget to update files with new variables!"
 
 test: 
 	@echo "Running tests..."
@@ -33,20 +40,5 @@ migration:
 	@echo "Applying migrations..."
 	@migrate -path=migrations -database "postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@localhost:5432/$(POSTGRES_DB)?sslmode=disable" -verbose up
 	@echo "Migrations applied success!"
-
-# docker  
-
-docker-build:
-	@echo "Building Docker image $(DOCKER_IMAGE)..."
-	@docker build -t $(DOCKER_IMAGE) . 
-
-docker-run:
-	@echo "Running Docker container $(DOCKER_CONTAINER)..."
-	@docker run --env-file $(ENV_FILE) --name $(DOCKER_CONTAINER) -p $(HTTP_ADDRESS):$(HTTP_ADDRESS) $(DOCKER_IMAGE)
-
-docker-clean:
-	@echo "Stopping and removing Docker container $(DOCKER_CONTAINER)..."
-	@docker stop $(DOCKER_CONTAINER) || true 
-	@docker rm $(DOCKER_CONTAINER) || true
 
 .PHONY: build test run clean deps

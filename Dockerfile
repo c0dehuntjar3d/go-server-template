@@ -1,17 +1,23 @@
-FROM golang:1.23-alpine AS builder
+FROM golang:alpine AS builder
 
-WORKDIR /usr/local/src
+WORKDIR /build
 
-RUN apk --no-cache add bash make gcc gettext musl-dev
-COPY ["./go.mod", "./go.sum", "./"]
+ADD go.mod .
+ADD go.sum .
 
 RUN go mod download
 
-COPY ./ ./
-RUN go build -o ./bin/app cmd/main.go
+COPY . .
 
-FROM alpine 
+WORKDIR /build/cmd
 
-COPY --from=builder /usr/local/src/bin/app /
+RUN go build -o server main.go
 
-CMD ["/app"]
+FROM alpine
+
+WORKDIR /build
+
+COPY --from=builder /build/cmd/server /build/server
+COPY --from=builder /build/docker.env /build/.env
+
+CMD ["/build/server"]
