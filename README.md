@@ -39,36 +39,49 @@ Create an `.env` file with the following structure to customize the configuratio
 
 ```env
 ##Application settings
-APP_NAME=template-server
-APP_VERSION=0.0.1
+APP_VERSION=0.1.0-dev
+APP_NAME=server
 
-##HTTP server settings
-HTTP_ADDRESS=8080
+##HTTP settings
 HTTP_READ_TIMEOUT=10s
-HTTP_WRITE_TIMEOUT=10s
-HTTP_SHUTDOWN_TIMEOUT=5s
+HTTP_WRITE_TIMEOUT=5s
+HTTP_SHUTDOWN_TIMEOUT=3s
+HTTP_ADDRESS=:3000
 
-##Logging settings
+##LOG settings
 LOG_LEVEL=debug
-LOG_ENCODING=json
-LOG_OUTPUT_PATH=/var/log/app.log
-LOG_ERROR_ENABLED=true
+LOG_OUTPUT_PATH=stderr
+LOG_ENCODING=console
 
-##Database settings
-DB_URL=postgresql://user:password@localhost:5432/mydb?sslmode=disable
-DB_CONNECTION_TIMEOUT=60
-DB_CONNECTION_ATTEMPTS=5
+##DATABASE settings
+DB_USER=postgres
+DB_PASSWORD=1234
+DB_DATABASE=appdb
+DB_MAX_CONS=10 
+DB_PORT=5432
+DB_SSL=disable
+DB_HOST=localhost
+DB_VOLUME=app-volume
 
-##Cache settings
-REDIS_URL=redis://<user>:<pass>@localhost:6379/<db>
+##DOCKER settings
+DOCKER_IMAGE=server_image
+DOCKER_CONTAINER=server_container 
 ```
 
 ### Commands
 
-To run your application with a specific `.env` file, use the `-env` flag:
+To run application:
+
+#### With Makefile
 
 ```bash
-go run main.go -env config/.env
+make startup
+```
+
+#### With Go built-in
+
+```bash
+go run cmd/main.go
 ```
 
 ### License
