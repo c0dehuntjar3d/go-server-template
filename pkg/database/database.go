@@ -4,6 +4,7 @@ import (
 	"app/config"
 	"app/pkg/logger"
 	"context"
+	"errors"
 	"fmt"
 
 	"sync"
@@ -27,8 +28,8 @@ var pg *Postgres
 var hdlOnce sync.Once
 
 func NewOrGetSingletonPostgres(cfg *config.DB, logger logger.Interface) (*Postgres, error) {
-	if cfg == nil || cfg.URL == "" {
-		return nil, nil
+	if cfg == nil || validateEmpty(cfg) {
+		return nil, errors.New("cfg is not valid")
 	}
 
 	var er error
@@ -44,6 +45,10 @@ func NewOrGetSingletonPostgres(cfg *config.DB, logger logger.Interface) (*Postgr
 	return pg, er
 }
 
+func validateEmpty(cfg *config.DB) bool {
+	return cfg.Database == "" || cfg.Password == "" || cfg.User == ""
+}
+
 func newDatabase(cfg *config.DB, log logger.Interface) (*Postgres, error) {
 	pg = &Postgres{
 		logger:       log,
@@ -53,7 +58,17 @@ func newDatabase(cfg *config.DB, log logger.Interface) (*Postgres, error) {
 
 	pg.Builder = squirrel.StatementBuilder.PlaceholderFormat(squirrel.Dollar)
 
-	poolConfig, err := pgxpool.ParseConfig(cfg.URL)
+	url := fmt.Sprintf(
+		"postgres://%s:%s@%s:%d/%s?sslmode=%s",
+		cfg.User,
+		cfg.Password,
+		cfg.Host,
+		cfg.Port,
+		cfg.Database,
+		cfg.SSL,
+	)
+
+	poolConfig, err := pgxpool.ParseConfig(url)
 	if err != nil {
 		return nil, fmt.Errorf("postgres - NewPostgres - pgxpool.ParseConfig: %w", err)
 	}

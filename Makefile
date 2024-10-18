@@ -3,7 +3,7 @@ ENV_FILE := .env
 include $(ENV_FILE)
 export $(shell sed 's/=.*//' $(ENV_FILE))  
 
-startup: deps test build database migration run
+startup: database deps test build migration run
 
 env:
 	@echo "Creating local env..."
@@ -31,14 +31,14 @@ deps:
 
 database:
 	@echo "Creating volume..."
-	@docker volume create $(POSTGRES_VOLUME)
+	@docker volume create $(DB_VOLUME)
 	@echo "Database loading..."
-	@docker start $(APP_NAME)-db || docker run --name $(APP_NAME)-db -e POSTGRES_USER=$(POSTGRES_USER) -e POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) -e POSTGRES_DB=$(POSTGRES_DB) -v $(POSTGRES_VOLUME):/var/lib/postgresql/data -d -p 5432:5432 postgres
+	@docker start $(APP_NAME)-db || docker run --name $(APP_NAME)-db -e POSTGRES_USER=$(DB_USER) -e POSTGRES_PASSWORD=$(DB_PASSWORD) -e POSTGRES_DB=$(DB_DATABASE) -v $(DB_VOLUME):/var/lib/postgresql/data -d -p $(DB_PORT):$(DB_PORT) postgres
 	@echo "Database created"
 
 migration:
 	@echo "Applying migrations..."
-	@migrate -path=migrations -database "postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@localhost:5432/$(POSTGRES_DB)?sslmode=disable" -verbose up
+	@migrate -path=migrations -database "postgres://$(DB_USER):$(DB_PASSWORD)@localhost:5432/$(DB_DATABASE)?sslmode=disable" -verbose up
 	@echo "Migrations applied success!"
 
 .PHONY: build test run clean deps

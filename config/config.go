@@ -28,11 +28,8 @@ const (
 	defaultLogOutputPath   = "stderr"
 	defaultLogErrorEnabled = true
 
-	defaultDBURL                = ""
 	defaultDBConnectionTimeout  = 30
 	defaultDBConnectionAttempts = 3
-
-	redisURL = ""
 )
 
 type (
@@ -64,7 +61,13 @@ type (
 	}
 
 	DB struct {
-		URL                string
+		User               string
+		Password           string
+		Database           string
+		Host               string
+		SSL                string
+		Port               int
+		MaxConnection      int
 		ConnectionTimeout  int
 		ConnectionAttempts int
 	}
@@ -128,18 +131,23 @@ func New() *Config {
 			ShutdownTimeout: getEnvAsDuration("HTTP_SHUTDOWN_TIMEOUT", defaultShutdownTimeout),
 		},
 		Log: &Log{
-			Level:        getEnv("LOG_LEVEL", defaultLogLevel),
-			Encoding:     getEnv("LOG_ENCODING", defaultLogEncoding),
-			OutputPath:   getEnv("LOG_OUTPUT_PATH", defaultLogOutputPath),
-			ErrorEnabled: getEnvAsBool("LOG_ERROR_ENABLED", defaultLogErrorEnabled),
+			Level:      getEnv("LOG_LEVEL", defaultLogLevel),
+			Encoding:   getEnv("LOG_ENCODING", defaultLogEncoding),
+			OutputPath: getEnv("LOG_OUTPUT_PATH", defaultLogOutputPath),
 		},
 		DB: &DB{
-			URL:                getEnv("DB_URL", defaultDBURL),
+			User:               getEnv("DB_USER", ""),
+			Password:           getEnv("DB_PASSWORD", ""),
+			Database:           getEnv("DB_DATABASE", ""),
+			SSL:                getEnv("DB_SSL", "disable"),
+			Host:               getEnv("DB_HOST", "localhost"),
+			MaxConnection:      getEnvAsInt("DB_MAX_CONNECTION", 0),
+			Port:               getEnvAsInt("DB_PORT", 5432),
 			ConnectionTimeout:  getEnvAsInt("DB_CONNECTION_TIMEOUT", defaultDBConnectionTimeout),
 			ConnectionAttempts: getEnvAsInt("DB_CONNECTION_ATTEMPTS", defaultDBConnectionAttempts),
 		},
 		Cache: &Cache{
-			URL: getEnv("REDIS_URL", redisURL),
+			URL: getEnv("REDIS_URL", ""),
 		},
 	}
 }
