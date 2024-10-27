@@ -1,7 +1,7 @@
 package httpserver
 
 import (
-	"app/config"
+	"app/pkg/config"
 	"app/pkg/logger"
 	"app/pkg/middleware"
 	"context"

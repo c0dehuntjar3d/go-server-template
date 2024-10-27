@@ -1,7 +1,7 @@
 package database
 
 import (
-	"app/config"
+	"app/pkg/config"
 	"app/pkg/logger"
 	"context"
 	"errors"

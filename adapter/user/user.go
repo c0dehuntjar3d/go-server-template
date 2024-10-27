@@ -2,10 +2,10 @@ package user
 
 import (
 	"app/adapter"
-	"app/config"
 	userHandler "app/internal/controller/rest/user"
 	userRepo "app/internal/repository/postgres/user"
 	userCase "app/internal/usecase/user"
+	"app/pkg/config"
 	"app/pkg/database"
 	"app/pkg/httpserver"
 	"app/pkg/logger"

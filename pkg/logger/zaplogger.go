@@ -1,7 +1,7 @@
 package logger
 
 import (
-	"app/config"
+	"app/pkg/config"
 	"fmt"
 	"strings"
 

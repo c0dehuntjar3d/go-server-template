@@ -2,7 +2,7 @@ package initializer
 
 import (
 	"app/adapter/user"
-	"app/config"
+	"app/pkg/config"
 	"app/pkg/database"
 	"app/pkg/httpserver"
 	"app/pkg/logger"
