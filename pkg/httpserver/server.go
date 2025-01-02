@@ -1,9 +1,6 @@
 package httpserver
 
 import (
-	"app/pkg/config"
-	"app/pkg/logger"
-	"app/pkg/middleware"
 	"context"
 	"fmt"
 	"net"
@@ -12,6 +9,10 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"app/pkg/config"
+	"app/pkg/logger"
+	"app/pkg/middleware"
 )
 
 type Server struct {

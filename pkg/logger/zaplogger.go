@@ -1,12 +1,13 @@
 package logger
 
 import (
-	"app/pkg/config"
 	"fmt"
 	"strings"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+
+	"app/pkg/config"
 )
 
 type ZapLogger struct {

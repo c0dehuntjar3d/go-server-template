@@ -78,6 +78,7 @@ type (
 )
 
 var hdlOnce sync.Once
+
 var config *Config
 
 func LoadOrGetSingleton() (*Config, error) {

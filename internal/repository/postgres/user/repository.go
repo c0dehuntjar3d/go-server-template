@@ -1,8 +1,9 @@
 package user
 
 import (
-	"app/domain"
 	"context"
+
+	"app/domain"
 )
 
 type UserRepository interface {

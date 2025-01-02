@@ -1,9 +1,10 @@
 package converter
 
 import (
+	"time"
+
 	"app/domain"
 	postgres "app/internal/repository/postgres/user/model"
-	"time"
 )
 
 func ToUserFromRepository(repoUser *postgres.User) *domain.User {

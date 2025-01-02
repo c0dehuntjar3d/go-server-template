@@ -1,16 +1,17 @@
 package user
 
 import (
+	"context"
+	"errors"
+	"fmt"
+	"time"
+
 	"app/domain"
 	"app/internal/repository/postgres/user/converter"
 	repoUser "app/internal/repository/postgres/user/model"
 	"app/pkg/database"
 	"app/pkg/logger"
 	"app/pkg/types"
-	"context"
-	"errors"
-	"fmt"
-	"time"
 )
 
 func NewRepository() *repository {

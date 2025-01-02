@@ -1,13 +1,14 @@
 package initializer
 
 import (
+	"errors"
+	"fmt"
+
 	"app/adapter/user"
 	"app/pkg/config"
 	"app/pkg/database"
 	"app/pkg/httpserver"
 	"app/pkg/logger"
-	"errors"
-	"fmt"
 )
 
 var (

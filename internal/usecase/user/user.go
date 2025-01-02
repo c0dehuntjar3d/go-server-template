@@ -1,13 +1,14 @@
 package user
 
 import (
+	"context"
+	"errors"
+	"fmt"
+
 	"app/domain"
 	"app/internal/repository/postgres/user"
 	"app/pkg/logger"
 	"app/pkg/types"
-	"context"
-	"errors"
-	"fmt"
 )
 
 var _ UserService = (*service)(nil)

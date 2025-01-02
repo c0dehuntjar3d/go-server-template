@@ -1,11 +1,12 @@
 package converter
 
 import (
-	"app/domain"
-	rest "app/internal/controller/rest/user/model"
 	"time"
 
 	"github.com/google/uuid"
+
+	"app/domain"
+	rest "app/internal/controller/rest/user/model"
 )
 
 func ToUserFromRest(user rest.User) *domain.User {

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/redis/go-redis/v9"
+	redis "github.com/redis/go-redis/v9"
 )
 
 type Cache struct {
@@ -12,6 +12,7 @@ type Cache struct {
 }
 
 var cache *Cache
+
 var hdlOnce sync.Once
 
 func NewOrGetSingletonCache(url string) (*Cache, error) {

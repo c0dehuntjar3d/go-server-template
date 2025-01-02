@@ -1,14 +1,15 @@
 package middleware
 
 import (
-	"app/pkg/logger"
-	"app/pkg/types"
 	"context"
 	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/google/uuid"
+
+	"app/pkg/logger"
+	"app/pkg/types"
 )
 
 func Logging(next http.Handler, logger logger.Interface) http.Handler {

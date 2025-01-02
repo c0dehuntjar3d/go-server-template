@@ -1,17 +1,17 @@
 package database
 
 import (
-	"app/pkg/config"
-	"app/pkg/logger"
 	"context"
 	"errors"
 	"fmt"
-
 	"sync"
 	"time"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v4/pgxpool"
+
+	"app/pkg/config"
+	"app/pkg/logger"
 )
 
 type Postgres struct {
@@ -25,6 +25,7 @@ type Postgres struct {
 }
 
 var pg *Postgres
+
 var hdlOnce sync.Once
 
 func NewOrGetSingletonPostgres(cfg *config.DB, logger logger.Interface) (*Postgres, error) {

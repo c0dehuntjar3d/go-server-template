@@ -1,14 +1,15 @@
 package user
 
 import (
+	"encoding/json"
+	"errors"
+	"net/http"
+
 	"app/domain"
 	"app/internal/controller/rest/user/converter"
 	rest "app/internal/controller/rest/user/model"
 	"app/internal/usecase/user"
 	"app/pkg/logger"
-	"encoding/json"
-	"errors"
-	"net/http"
 )
 
 type UserHandler struct {
@@ -16,8 +17,11 @@ type UserHandler struct {
 	logger  logger.Interface
 }
 
-func NewUserHandler(service user.UserService, logger logger.Interface, mux *http.ServeMux) (*UserHandler, error) {
-
+func NewUserHandler(
+	service user.UserService,
+	logger logger.Interface,
+	mux *http.ServeMux,
+) (*UserHandler, error) {
 	if service == nil {
 		return nil, errors.New("service is null")
 	}
