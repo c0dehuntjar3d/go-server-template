@@ -11,73 +11,73 @@ import (
 	"app/pkg/types"
 )
 
-var _ UserService = (*service)(nil)
+var _ UserService = (*userService)(nil)
 
-type service struct {
+type userService struct {
 	repository user.UserRepository
 	logger     logger.Interface
 }
 
-func NewUserService(repository user.UserRepository, logger logger.Interface) (*service, error) {
+func NewUserService(repository user.UserRepository, logger logger.Interface) (*userService, error) {
 	if repository == nil {
-		return nil, errors.New("db is null")
+		return nil, errors.New("userService.NewUserService: repository is null")
 	}
 
 	if logger == nil {
-		return nil, errors.New("logger is null")
+		return nil, errors.New("userService.NewUserService: logger is null")
 	}
 
-	return &service{
+	return &userService{
 		repository: repository,
 		logger:     logger,
 	}, nil
 }
 
-func (s *service) Create(ctx context.Context, user *domain.User) (string, error) {
+func (s *userService) Create(ctx context.Context, user *domain.User) (string, error) {
 	if user == nil {
-		return "", fmt.Errorf("user is nil")
+		return "", fmt.Errorf("userService.Create: user is nil")
 	}
 
 	txID := ctx.Value(types.CtxKey("tx")).(string)
-	s.logger.Debug(fmt.Sprintf("txID: %s [service], creating user: %v", txID, user))
+	s.logger.Debug(fmt.Sprintf("txID: %s userService.Create, creating user: %v", txID, user))
 
 	u, err := s.repository.Create(ctx, user)
 	if err != nil {
-		s.logger.Error(fmt.Sprintf("txID: %s [service], error creating user: %v", txID, err))
-		return "", err
+		s.logger.Error(fmt.Sprintf("txID: %s userService.Create, error creating user: %v", txID, err))
+		return "", fmt.Errorf("userService.Create: %w", err)
 	}
 
-	s.logger.Debug(fmt.Sprintf("txID: %s [service], successfully created user: %v", txID, user))
+	s.logger.Debug(fmt.Sprintf("txID: %s userService.Create, successfully created user: %v", txID, user))
 	return u.Uuid, nil
 }
 
-func (s *service) Get(ctx context.Context, uuid string) (*domain.User, error) {
+func (s *userService) Get(ctx context.Context, uuid string) (*domain.User, error) {
 	txID := ctx.Value(types.CtxKey("tx")).(string)
-	s.logger.Debug(fmt.Sprintf("txID: %s [service], get user with UUID: %s", txID, uuid))
+	s.logger.Debug(fmt.Sprintf("txID: %s userService.Get, fetching user with UUID: %s", txID, uuid))
 
 	user, err := s.repository.Get(ctx, uuid)
 	if err != nil {
-		s.logger.Error(fmt.Sprintf("txID: %s [service], error get user: %v", txID, err))
-		return nil, err
+		s.logger.Error(fmt.Sprintf("txID: %s userService.Get, error fetching user: %v", txID, err))
+		return nil, fmt.Errorf("userService.Get: %w", err)
 	} else if user == nil {
-		s.logger.Debug(fmt.Sprintf("txID: %s [service], user not found by UUID: %s", txID, uuid))
+		s.logger.Debug(fmt.Sprintf("txID: %s userService.Get, user not found by UUID: %s", txID, uuid))
 		return nil, domain.ErrorUserNotFound
 	}
 
-	s.logger.Debug(fmt.Sprintf("txID: %s [service], successfully get user: %v", txID, user))
+	s.logger.Debug(fmt.Sprintf("txID: %s userService.Get, successfully fetched user: %v", txID, user))
 	return user, nil
 }
 
-func (s *service) Delete(ctx context.Context, uuid string) error {
+func (s *userService) Delete(ctx context.Context, uuid string) error {
 	txID := ctx.Value(types.CtxKey("tx")).(string)
-	s.logger.Debug(fmt.Sprintf("txID: %s [service], deleting user with UUID: %s", txID, uuid))
+	s.logger.Debug(fmt.Sprintf("txID: %s userService.Delete, deleting user with UUID: %s", txID, uuid))
 
 	user, err := s.repository.Delete(ctx, uuid)
 	if err != nil {
-		s.logger.Error(fmt.Sprintf("txID: %s [service], error deleting user: %v", txID, err))
-		return err
+		s.logger.Error(fmt.Sprintf("txID: %s userService.Delete, error deleting user: %v", txID, err))
+		return fmt.Errorf("userService.Delete: %w", err)
 	}
 
-	s.logger.Debug(fmt.Sprintf("txID: %s [service], successfully deleted user: %v", txID, user))
+	s.logger.Debug(fmt.Sprintf("txID: %s userService.Delete, successfully deleted user: %v", txID, user))
 	return nil
 }

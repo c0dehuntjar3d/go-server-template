@@ -23,15 +23,15 @@ func NewUserHandler(
 	mux *http.ServeMux,
 ) (*UserHandler, error) {
 	if service == nil {
-		return nil, errors.New("service is null")
+		return nil, errors.New("UserHandler.NewUserHandler: service is null")
 	}
 
 	if logger == nil {
-		return nil, errors.New("logger is null")
+		return nil, errors.New("UserHandler.NewUserHandler: logger is null")
 	}
 
 	if mux == nil {
-		return nil, errors.New("mux is null")
+		return nil, errors.New("UserHandler.NewUserHandler: mux is null")
 	}
 
 	handler := &UserHandler{Service: service, logger: logger}
@@ -44,14 +44,14 @@ func NewUserHandler(
 func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var user rest.User
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-		h.logger.Error("Error decoding user: " + err.Error())
+		h.logger.Error("UserHandler.CreateUser: error decoding user: " + err.Error())
 		http.Error(w, "Invalid request payload", http.StatusBadRequest)
 		return
 	}
 
 	userID, err := h.Service.Create(r.Context(), converter.ToUserFromRest(user))
 	if err != nil {
-		h.logger.Error("Error creating user: " + err.Error())
+		h.logger.Error("UserHandler.CreateUser: error creating user: " + err.Error())
 		http.Error(w, "Could not create user", http.StatusInternalServerError)
 		return
 	}
@@ -72,7 +72,7 @@ func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 		if err == domain.ErrorUserNotFound {
 			w.WriteHeader(http.StatusNotFound)
 		} else {
-			h.logger.Error("Error fetching user: " + err.Error())
+			h.logger.Error("UserHandler.GetUser: error fetching user: " + err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 		return
@@ -90,7 +90,7 @@ func (h *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.Service.Delete(r.Context(), uuid); err != nil {
-		h.logger.Error("Error deleting user: " + err.Error())
+		h.logger.Error("UserHandler.DeleteUser: error deleting user: " + err.Error())
 		http.Error(w, "Could not delete user", http.StatusInternalServerError)
 		return
 	}
