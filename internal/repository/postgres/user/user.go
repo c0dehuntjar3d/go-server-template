@@ -12,6 +12,9 @@ import (
 	"app/pkg/database"
 	"app/pkg/logger"
 	"app/pkg/types"
+
+	sq "github.com/Masterminds/squirrel"
+	"github.com/jackc/pgx/v4"
 )
 
 func NewRepository() *repository {
@@ -48,21 +51,23 @@ func (r *repository) Create(ctx context.Context, u *domain.User) (*domain.User, 
 	txID := ctx.Value(types.CtxKey("tx")).(string)
 	r.logger.Debug(fmt.Sprintf("txID: %s [repository], creating user: %v", txID, u))
 
-	query := `INSERT INTO users (uuid, login, password, created_at) 
-              VALUES ($1, $2, $3, $4) RETURNING uuid`
-
 	u.CreatedAt = time.Now()
 	repoUser := converter.ToUserFromDomain(u)
 
-	err := r.db.Pool.QueryRow(
-		ctx,
-		query,
-		repoUser.Uuid,
-		repoUser.Login,
-		repoUser.Password,
-		repoUser.CreatedAt,
-	).Scan(&repoUser.Uuid)
+	query, args, err := sq.
+		Insert("users").
+		Columns("uuid", "login", "password", "created_at").
+		Values(repoUser.Uuid, repoUser.Login, repoUser.Password, repoUser.CreatedAt).
+		Suffix("RETURNING uuid").
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
 
+	if err != nil {
+		r.logger.Error(fmt.Sprintf("txID: %s [repository], error building query: %v", txID, err))
+		return nil, err
+	}
+
+	err = r.db.Pool.QueryRow(ctx, query, args...).Scan(&repoUser.Uuid)
 	if err != nil {
 		r.logger.Error(fmt.Sprintf("txID: %s [repository], error creating user: %v", txID, err))
 		return nil, err
@@ -78,15 +83,22 @@ func (r *repository) Delete(ctx context.Context, uuid string) (*domain.User, err
 
 	r.logger.Debug(fmt.Sprintf("txID: %s [repository], deleting user with UUID: %s", txID, uuid))
 
-	query := `UPDATE users 
-              SET deleted_at = $1 
-              WHERE uuid = $2 
-              RETURNING uuid, login, password, created_at, updated_at, deleted_at`
-
 	now := time.Now()
-	user := &repoUser.User{}
+	query, args, err := sq.
+		Update("users").
+		Set("deleted_at", now).
+		Where(sq.Eq{"uuid": uuid}).
+		Suffix("RETURNING uuid, login, password, created_at, updated_at, deleted_at").
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
 
-	err := r.db.Pool.QueryRow(ctx, query, now, uuid).Scan(
+	if err != nil {
+		r.logger.Error(fmt.Sprintf("txID: %s [repository], error building query: %v", txID, err))
+		return nil, err
+	}
+
+	user := &repoUser.User{}
+	err = r.db.Pool.QueryRow(ctx, query, args...).Scan(
 		&user.Uuid,
 		&user.Login,
 		&user.Password,
@@ -110,16 +122,20 @@ func (r *repository) Get(ctx context.Context, uuid string) (*domain.User, error)
 
 	r.logger.Debug(fmt.Sprintf("txID: %s [repository], fetching user with UUID: %s", txID, uuid))
 
-	query := `SELECT uuid, login, password, created_at, updated_at, deleted_at 
-              FROM users WHERE uuid = $1`
+	query, args, err := sq.
+		Select("uuid", "login", "password", "created_at", "updated_at", "deleted_at").
+		From("users").
+		Where(sq.Eq{"uuid": uuid, "deleted_at": nil}).
+		PlaceholderFormat(sq.Dollar).
+		ToSql()
+
+	if err != nil {
+		r.logger.Error(fmt.Sprintf("txID: %s [repository], error building query: %v", txID, err))
+		return nil, err
+	}
 
 	user := &repoUser.User{}
-
-	err := r.db.Pool.QueryRow(
-		ctx,
-		query,
-		uuid,
-	).Scan(
+	err = r.db.Pool.QueryRow(ctx, query, args...).Scan(
 		&user.Uuid,
 		&user.Login,
 		&user.Password,
@@ -129,10 +145,14 @@ func (r *repository) Get(ctx context.Context, uuid string) (*domain.User, error)
 	)
 
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			r.logger.Debug(fmt.Sprintf("txID: %s [repository], user with UUID: %s not found", txID, uuid))
+			return nil, nil
+		}
+
 		r.logger.Error(fmt.Sprintf("txID: %s [repository], error fetching user: %v", txID, err))
 		return nil, err
 	}
-
 	r.logger.Debug(fmt.Sprintf("txID: %s [repository], successfully fetched user with UUID: %s", txID, user.Uuid))
 
 	return converter.ToUserFromRepository(user), nil
