@@ -23,7 +23,7 @@ run:
 build:
 	@echo "Building $(APP_NAME)"
 	@mkdir -p bin
-	@go build -o bin/$(APP_NAME) cmd/main.go
+	@go build -o bin/$(APP_NAME) cmd/server/main.go
 
 deps:
 	@echo "Installing dependencies..."
