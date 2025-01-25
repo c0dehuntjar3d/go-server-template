@@ -69,11 +69,11 @@ func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 
 	user, err := h.Service.Get(r.Context(), uuid)
 	if err != nil {
-		h.logger.Error("Error fetching user: " + err.Error())
 		if err == domain.ErrorUserNotFound {
-			http.Error(w, "User not found", http.StatusNotFound)
+			w.WriteHeader(http.StatusNotFound)
 		} else {
-			http.Error(w, "Could not fetch user", http.StatusInternalServerError)
+			h.logger.Error("Error fetching user: " + err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
 		}
 		return
 	}
