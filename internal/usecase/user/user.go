@@ -59,6 +59,9 @@ func (s *service) Get(ctx context.Context, uuid string) (*domain.User, error) {
 	if err != nil {
 		s.logger.Error(fmt.Sprintf("txID: %s [service], error get user: %v", txID, err))
 		return nil, err
+	} else if user == nil {
+		s.logger.Debug(fmt.Sprintf("txID: %s [service], user not found by UUID: %s", txID, uuid))
+		return nil, domain.ErrorUserNotFound
 	}
 
 	s.logger.Debug(fmt.Sprintf("txID: %s [service], successfully get user: %v", txID, user))
